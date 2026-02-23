@@ -1,0 +1,155 @@
+You are an expert full-stack engineer + product designer. Build “Eventsdey Nigeria” — a world-class, mobile-first web app for event venue discovery and booking, inspired by https://www.eventsdey.com but redesigned to be extremely intuitive and user friendly on mobile.
+
+LAUNCH CONTEXT
+- Launch country: Nigeria
+- Currency default: NGN
+- Payments: Paystack ONLY (cards + bank transfer where available) with secure webhooks
+- Regions: Lagos, Abuja, Port Harcourt as seeded locations (expandable)
+
+PRODUCT PRINCIPLES (DO NOT IGNORE)
+- Mobile-first UX: thumb-friendly, big tap targets, minimal typing
+- 3-click path: Search → View → Request/Book
+- Make every page feel “guided” (clear next step)
+- Use progressive disclosure (hide advanced filters until needed)
+- Fast: optimize images, skeleton loaders, cached search results
+- Accessibility: good contrast, readable text, keyboard navigation
+
+CORE USER FLOWS (MUST BE GREAT)
+1) Find a venue:
+   - Home search card: Location + Date + Guests + Budget
+   - Results: list + optional map, smart filters
+2) Venue details:
+   - Sticky “Check availability” / “Request booking” button
+   - Gallery, capacity, amenities, rules, location, reviews
+3) Booking:
+   - Select date/time slot
+   - Choose add-ons (optional)
+   - Pay deposit or full amount via Paystack
+   - Confirmation with invoice/receipt
+4) Messaging:
+   - In-app chat between planner and venue holder
+5) Reviews:
+   - Only allowed after completed booking
+
+ROLES & PERMISSIONS (CRITICAL)
+- ADMIN: can add/edit/remove ANY venue, approve/verify venues, manage disputes, configure fees, manage users, feature listings.
+- VENUE_HOLDER: can add/edit/remove ONLY their venues from their dashboard, set availability, pricing, media, and respond to booking requests.
+- PLANNER (customer): can search, book, message, review.
+Admin must also be able to create a venue WITHOUT an owner, then later assign it to a venue holder.
+
+FEATURES REQUIRED FOR “GLOBAL STANDARD”
+SEARCH & DISCOVERY
+- Fast search with filters: location, capacity, budget, venue type, amenities, parking, accessibility, power/AV, indoor/outdoor
+- Featured venues carousel
+- Favorites/wishlist
+- SEO-friendly venue pages (server-side rendering optional; otherwise clean metadata)
+
+BOOKING & AVAILABILITY
+- Availability calendar per venue (simple slot system)
+- Two modes per venue:
+  - Request-to-book (default)
+  - Instant booking (optional toggle)
+- Cancellation policy per venue
+- Automatic status timeline: Requested → Accepted → Paid → Confirmed → Completed
+
+TRUST & QUALITY
+- Admin “Verified venue” badge
+- Photo quality guidelines + min photo count
+- Reviews only after completed bookings
+- Dispute flow with evidence upload and admin resolution
+
+ADMIN CONSOLE
+- Venue CRUD (independent of venue holders)
+- KYC-lite for venue holders (business name, ID upload, bank details)
+- Feature venues, homepage banners
+- Analytics: bookings count, GMV, conversion, cancellations
+- Audit logs
+
+PAYMENTS (PAYSTACK ONLY)
+- Paystack inline or redirect checkout (choose best practice)
+- Backend creates transaction reference
+- Verify transaction server-side
+- Webhook endpoint to confirm payments securely (signature verification)
+- Store payment records, receipts, refunds scaffold
+
+TECH STACK (REPLIT FRIENDLY)
+Frontend:
+- React 18 + TypeScript + Vite
+- TailwindCSS
+- shadcn/ui + Radix UI
+- TanStack React Query
+- Wouter or React Router (pick one)
+Backend:
+- Node.js + Express + TypeScript
+Database:
+- PostgreSQL (Replit/Neon)
+- Drizzle ORM + migrations
+Storage:
+- Cloudinary (preferred) or S3-compatible for venue images/videos
+
+DESIGN SYSTEM (GOLD + BLACK)
+- Background: deep black / charcoal
+- Primary: premium gold accent (buttons, highlights)
+- Cards: dark with subtle borders; gold hover accents
+- Typography: modern, large headings, clear spacing
+- UI behavior: sticky bottom CTA on mobile (Book/Request), step-by-step forms, toast confirmations
+
+PAGES / SCREENS
+Public:
+- Home, Search Results, Venue Details, Services (optional), Contact, FAQ
+Auth:
+- Sign up / Sign in / Forgot password
+Planner:
+- My Bookings, Messages, Favorites, Profile
+Venue Holder Dashboard:
+- My Venues, Calendar/Availability, Booking Requests, Messages, Payout setup, Analytics
+Admin Console:
+- Venues, Users/Roles, Verifications, Bookings, Disputes, Settings, Analytics
+
+DATABASE MODELS (MINIMUM)
+users (id, name, email, phone, role, password_hash)
+venue_holders (user_id, business_name, kyc_status, id_doc_url, bank_details_encrypted)
+venues (id, owner_user_id nullable, created_by_admin boolean, title, description, address, city, state, lat, lng, capacity, base_price, currency, amenities json, policies json, status, verified)
+venue_media (id, venue_id, url, type, sort_order)
+availability_slots (id, venue_id, start_ts, end_ts, status)
+bookings (id, venue_id, planner_user_id, status, start_ts, end_ts, guests, price_breakdown json, deposit_amount, total_amount, payment_status)
+payments (id, booking_id, provider="paystack", reference, amount, currency, status, raw_payload json)
+messages (id, booking_id, from_user_id, to_user_id, body, attachments json, created_at)
+reviews (id, venue_id, booking_id, planner_user_id, rating, comment)
+disputes (id, booking_id, opened_by_user_id, reason, status, evidence json)
+audit_logs (id, actor_user_id, action, entity_type, entity_id, metadata json, created_at)
+
+API ENDPOINTS (MINIMUM)
+- /auth/register, /auth/login, /auth/refresh
+- /venues/search (filters), /venues/:id
+- /venues (POST/PUT/DELETE) with RBAC
+- /availability (GET/SET)
+- /bookings (create, cancel, update status)
+- /messages (send/list)
+- /reviews (create/list)
+- /admin/* (venues, users, settings, disputes, analytics)
+- /payments/paystack/initialize
+- /payments/paystack/verify
+- /payments/paystack/webhook (secure signature check)
+
+IMPLEMENTATION ORDER
+1) DB + Drizzle migrations + seed (demo venues)
+2) Auth + RBAC middleware
+3) Venue CRUD + search filters + venue details page
+4) Availability + booking flow + booking statuses
+5) Paystack integration (initialize, verify, webhook)
+6) Dashboards: Venue Holder + Admin
+7) Messaging + Reviews + Disputes
+8) Polish UX: guided flows, skeletons, empty states, error handling
+
+DELIVERABLES
+- Monorepo:
+  /apps/web
+  /apps/api
+  /packages/ui (theme + components)
+  /packages/api-client (typed client)
+- Seed an admin user + a venue holder + 10 venues in Nigeria
+- Clear README with “Run locally on Replit” + env vars
+- Make it production-grade with validation, security, rate limiting
+
+Start by generating the repository, then implement backend + web UI first.
